@@ -27,6 +27,10 @@ class ClientApp(App):
     def screen_center(self) -> tuple[int, int]:
         return (self.screen.get_width() // 2, self.screen.get_height() // 2)
 
+    @property
+    def mouse_position(self) -> tuple[int, int]:
+        return pygame.mouse.get_pos()
+
     def run(self) -> None:
         pygame.init()
 
