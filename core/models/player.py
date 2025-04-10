@@ -7,12 +7,17 @@ class Player:
     def __init__(self, pos: list[int, int], image, number_of_sprites: int) -> None:
         pygame.init()
         self.pos = pos
-        self.__sprites_idle: list = self.__break_image(image[0], number_of_sprites[0])
-        self.__sprites_run: list = self.__break_image(image[1], number_of_sprites[1])
+        self.sprites = {
+            "__sprites_idle": self.__break_image(image[0], number_of_sprites[0]),
+            "__sprites_run": self.__break_image(image[1], number_of_sprites[1]),
+            "__sprites_attack": self.__break_image(image[2], number_of_sprites[2]),
+        }
+        self.__current_sprites: list = self.sprites["__sprites_idle"]
         self.sprite_index = 0
         self.__frame_animation = pygame.time.Clock()
         self.__frame_counter = 0
         self.__moviment_counter = 0
+        self.__animation_state = "dynamic"
         self.vel = 2
         self.direction = None
 
@@ -28,11 +33,7 @@ class Player:
         return sprites
 
     def draw(self, window) -> None:
-        if self.direction is None:
-            sprite = self.__sprite_animate(self.__sprites_idle)
-        else:
-            sprite = self.__sprite_animate(self.__sprites_run)
-
+        sprite = self.__sprite_animate(self.__current_sprites)
         if self.direction == "left":
             sprite = pygame.transform.flip(sprite, True, False)
 
@@ -41,9 +42,25 @@ class Player:
     def get_event(self, event) -> None:
         self._get_direction(event)
 
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and self.__animation_state == "dynamic":
+                print("enter")
+                self.__animation_state = "static"
+                self.__current_sprites = self.sprites["__sprites_attack"]
+                self.sprite_index = 0
+
     def update(self) -> None:
         time_passed = self.__frame_animation.tick()
         self.__frame_counter += time_passed
+
+        if self.__animation_state == "dynamic":
+            if self.direction is None:
+                self.__current_sprites = self.sprites["__sprites_idle"]
+            else:
+                self.__current_sprites = self.sprites["__sprites_run"]
+
+        print(self.__animation_state)
+
         self.__move()
 
     def _get_direction(self, event) -> None:
@@ -80,5 +97,8 @@ class Player:
             self.__frame_counter = 0
         if self.sprite_index < len(sprites):
             return sprites[self.sprite_index]
+        if self.__animation_state == "static":
+            self.__animation_state = "dynamic"
+            self.__current_sprites = self.sprites["__sprites_idle"]
         self.sprite_index = 0
         return sprites[self.sprite_index]
