@@ -1,0 +1,13 @@
+# Colors
+
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+
+# Map
+
+MAP_SIZE = (15, 10)
+PIXEL_LENGHT = 32
+MAP_MAGNITUDE = ((MAP_SIZE[0] + 2) * PIXEL_LENGHT, (MAP_SIZE[1] + 2) * PIXEL_LENGHT)
