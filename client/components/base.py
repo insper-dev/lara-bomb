@@ -18,12 +18,11 @@ class BaseComponent(ABC):
         window: pygame.Surface,
         label: str,
         position: tuple[int, int],
-        variant: Literal["standar", "primary", "secondaty", "outline"] = "standard",
+        variant: Literal["standar", "primary", "secondary", "outline"] = "standard",
         size: Literal["sm", "md", "lg"] = "md",
         text_type: Literal["standard", "title", "subtitle", "text"] = "standard",
         *,
         callback: Callable = lambda: print("Button clicked!"),
-        order: int | None = None,
     ) -> None:
         """
         Initialize the component.
@@ -44,7 +43,6 @@ class BaseComponent(ABC):
         self.callback = callback
         self.is_focused = False
         self.is_dissabled = False
-        self.order = order
         self.type = self.__class__.__name__.lower()
         self.surface = self._init_surface()
         self.rect = self.surface.get_rect(center=position)
@@ -54,10 +52,7 @@ class BaseComponent(ABC):
         """
         Initialize the surface of the component.
         """
-        surface = pygame.Surface
-        ...
-        NotImplementedError("Subclasses must implement this method.")
-        return surface
+        raise NotImplementedError("Subclasses must implement this method.")
 
     def _create_surface(self, size) -> pygame.Surface:
         """
@@ -93,16 +88,16 @@ class BaseComponent(ABC):
 
         return sizes[self.size]
 
-    def _hover(self, event) -> None:
+    # TODO: this is supposed to be abstract but overridable
+    def _handle_hover(self, event) -> None:
         if event.type == pygame.MOUSEMOTION:
             if self.rect.collidepoint(event.pos):
                 self.is_focused = True
-                self.update()
             else:
                 self.is_focused = False
-                self.update()
 
-    def _click(self, event) -> None:
+    # TODO: this is supposed to be abstract but overridable
+    def _handle_click(self, event) -> None:
         """
         Handle click events for the component.
         """
@@ -113,10 +108,12 @@ class BaseComponent(ABC):
             if event.key == pygame.K_RETURN and self.is_focused:
                 self._callback()
 
+    # TODO: this is abstract method too.
     def _handle_event(self, event: pygame.event.Event) -> None:
         ...
         return
 
+    # TODO: this is abstract
     def _render(self) -> None:
         ...
         return
@@ -131,19 +128,14 @@ class BaseComponent(ABC):
         if self.is_dissabled:
             return
         self._handle_event(event)
-        self._hover(event)
-        self._click(event)
+        self._handle_hover(event)
+        self._handle_click(event)
 
     def render(self) -> None:
         """
         Render the component.
         """
         self._render()
-        self.window.blit(self.surface, self.rect)
-
-    def update(self) -> None:
-        """
-        Update the component.
-        """
         self.surface = self._init_surface()
-        self.rect = self.surface.get_rect(center=self.position)
+        self.rect = self.surface.get_rect(center=(self.position))
+        self.window.blit(self.surface, self.rect)

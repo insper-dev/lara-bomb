@@ -47,8 +47,8 @@ class BaseScene(ABC):
         """
         Handle events for the scene.
         """
-
         self.handle_event(event)
+
         for components in self.components:
             components.handle_event(event)
 
@@ -56,6 +56,7 @@ class BaseScene(ABC):
         """
         Render the scene.
         """
+        # TODO: constante de cor. THIS IS A FUCKING BLACK!
         self.app.screen.fill((0, 0, 0))
 
         # Render the scene
@@ -72,6 +73,7 @@ class BaseScene(ABC):
 
         for event in pygame.event.get():
             self._handle_event(event)
+
         self._render()
 
     # TODO: type these functions

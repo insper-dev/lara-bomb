@@ -15,11 +15,8 @@ class Input(BaseComponent):
         text_type="standard",
         *,
         callback=...,
-        order=None,
     ) -> None:
-        super().__init__(
-            window, label, position, variant, size, text_type, callback=callback, order=order
-        )
+        super().__init__(window, label, position, variant, size, text_type, callback=callback)
         self.value: str = ""
         self.ini_label = self.label
         self.active: bool = False
