@@ -26,7 +26,9 @@ class Button(BaseComponent):
         pygame.draw.rect(surface, self._get_color("bg"), background_rect, border_radius=radius)
 
         # draw the border
-        pygame.draw.rect(surface, (0, 0, 255), rect, border_radius=radius, width=thickness)
+        pygame.draw.rect(
+            surface, self._get_color("border"), rect, border_radius=radius, width=thickness
+        )
 
         # blit the text surface
         surface.blit(text_surface, text_surface.get_rect(center=middle))

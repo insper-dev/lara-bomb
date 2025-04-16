@@ -4,7 +4,8 @@ from typing import Literal
 
 import pygame
 
-from core.types import Cordinates, Thickness
+from core.constants import FONT_SIZE_MAP, FONT_STYLES, SIZE_MAP, VARIANT_MAP
+from core.types import Cordinates, Font_Path, Thickness
 
 
 class BaseComponent(ABC):
@@ -19,8 +20,10 @@ class BaseComponent(ABC):
         position: tuple[int, int],
         variant: Literal["standar", "primary", "secondaty", "outline"] = "standard",
         size: Literal["sm", "md", "lg"] = "md",
+        text_type: Literal["standard", "title", "subtitle", "text"] = "standard",
         *,
         callback: Callable = lambda: print("Button clicked!"),
+        order: int | None = None,
     ) -> None:
         """
         Initialize the component.
@@ -37,9 +40,12 @@ class BaseComponent(ABC):
         self.position = position
         self.variant = variant
         self.size = size
+        self.text_type = text_type
         self.callback = callback
         self.is_focused = False
-        self.dissabled = False
+        self.is_dissabled = False
+        self.order = order
+        self.type = self.__class__.__name__.lower()
         self.surface = self._init_surface()
         self.rect = self.surface.get_rect(center=position)
 
@@ -63,52 +69,31 @@ class BaseComponent(ABC):
         """
         Get the color of the component based on its part.
         """
-        colors = {
-            "standard": {"bg": (255, 255, 255), "text": (0, 0, 0), "border": (0, 0, 0)},
-            "primary": {"bg": (0, 0, 255), "text": (255, 255, 255), "border": (0, 0, 0)},
-            "secondary": {"bg": (0, 255, 0), "text": (255, 255, 255), "border": (0, 0, 0)},
-            "outline": {"bg": (255, 255, 255), "text": (0, 0, 0), "border": (0, 0, 0)},
-        }
+        colors = VARIANT_MAP[self.is_dissabled][self.is_focused]
+
         return colors[self.variant][surface_part]
 
-    def _get_font(self) -> pygame.font.Font:
+    def _get_font(self, font_style: Font_Path | None = None) -> pygame.font.Font:
         """
         Get the font of the component.
         """
 
-        fonts = {
-            "sm": pygame.font.Font(None, 20),
-            "md": pygame.font.Font(None, 30),
-            "lg": pygame.font.Font(None, 40),
-        }
-        return fonts[self.size]
+        font_size = FONT_SIZE_MAP[self.is_focused][self.text_type][self.size]
+        font_style = FONT_STYLES[font_style]
+        font = pygame.font.Font(font_style, font_size)
+
+        return font
 
     def _get_size(self) -> tuple[Cordinates, Thickness]:
         """
         Get the size of the component.
         """
 
-        sizes = {
-            "sm": ((100, 30), 2),
-            "md": ((150, 40), 3),
-            "lg": ((200, 50), 4),
-        }
+        sizes = SIZE_MAP[self.is_focused][self.type]
 
-        on_focus_size = {
-            "sm": ((125, 35), 3),
-            "md": ((175, 45), 4),
-            "lg": ((225, 55), 5),
-        }
-        if self.is_focused:
-            return on_focus_size[self.size]
         return sizes[self.size]
 
-    def handle_event(self, event: pygame.event.Event) -> None:
-        """
-        Handle events for the component.
-        """
-        if self.dissabled:
-            return
+    def _hover(self, event) -> None:
         if event.type == pygame.MOUSEMOTION:
             if self.rect.collidepoint(event.pos):
                 self.is_focused = True
@@ -116,15 +101,44 @@ class BaseComponent(ABC):
             else:
                 self.is_focused = False
                 self.update()
+
+    def _click(self, event) -> None:
+        """
+        Handle click events for the component.
+        """
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos):
-                print("clicked")
-                self.callback()
+                self._callback()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN and self.is_focused:
+                self._callback()
+
+    def _handle_event(self, event: pygame.event.Event) -> None:
+        ...
+        return
+
+    def _render(self) -> None:
+        ...
+        return
+
+    def _callback(self) -> None:
+        self.callback()
+
+    def handle_event(self, event: pygame.event.Event) -> None:
+        """
+        Handle events for the component.
+        """
+        if self.is_dissabled:
+            return
+        self._handle_event(event)
+        self._hover(event)
+        self._click(event)
 
     def render(self) -> None:
         """
         Render the component.
         """
+        self._render()
         self.window.blit(self.surface, self.rect)
 
     def update(self) -> None:
