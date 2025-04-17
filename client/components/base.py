@@ -16,8 +16,8 @@ class BaseComponent(ABC):
     def __init__(
         self,
         window: pygame.Surface,
-        label: str,
         position: tuple[int, int],
+        label: str,
         variant: Literal["standar", "primary", "secondary", "outline"] = "standard",
         size: Literal["sm", "md", "lg"] = "md",
         text_type: Literal["standard", "title", "subtitle", "text"] = "standard",
@@ -88,7 +88,6 @@ class BaseComponent(ABC):
 
         return sizes[self.size]
 
-    # TODO: this is supposed to be abstract but overridable
     def _handle_hover(self, event) -> None:
         if event.type == pygame.MOUSEMOTION:
             if self.rect.collidepoint(event.pos):
@@ -96,7 +95,6 @@ class BaseComponent(ABC):
             else:
                 self.is_focused = False
 
-    # TODO: this is supposed to be abstract but overridable
     def _handle_click(self, event) -> None:
         """
         Handle click events for the component.
@@ -108,12 +106,10 @@ class BaseComponent(ABC):
             if event.key == pygame.K_RETURN and self.is_focused:
                 self._callback()
 
-    # TODO: this is abstract method too.
     def _handle_event(self, event: pygame.event.Event) -> None:
         ...
         return
 
-    # TODO: this is abstract
     def _render(self) -> None:
         ...
         return

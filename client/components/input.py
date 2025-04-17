@@ -16,7 +16,7 @@ class Input(BaseComponent):
         *,
         callback=...,
     ) -> None:
-        super().__init__(window, label, position, variant, size, text_type, callback=callback)
+        super().__init__(window, position, label, variant, size, text_type, callback=callback)
         self.value: str = ""
         self.ini_label = self.label
         self.active: bool = False
@@ -70,7 +70,6 @@ class Input(BaseComponent):
                 else:
                     self.add = " "
                     self.time["time_counter"] = 0
-            self.update()
         else:
             self.label = self.value
         if self.label == "" and not self.active:
@@ -81,7 +80,6 @@ class Input(BaseComponent):
         self.label = self.value
         if self.label == "" and not self.active:
             self.label = self.ini_label
-        self.update()
 
     def _handle_event(self, event) -> None:
         if self.active:

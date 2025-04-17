@@ -1,6 +1,6 @@
 import pygame
 
-from client.components import BaseComponent, Button, Input, TextArea
+from client.components import BaseComponent, Button, Input, State, TextArea
 from client.scenes.base import BaseScene
 
 
@@ -12,32 +12,30 @@ class StartScene(BaseScene):
         self.components: list[BaseComponent] = [
             TextArea(
                 self.app.screen,
-                label="BombDuni",
                 position=(self.app.screen_center[0], self.app.screen_center[1] * 0.6),
+                label="BombDuni",
                 variant="standard",
                 size="lg",
                 text_type="title",
             ),
-            Button(
+            Input(
                 self.app.screen,
-                label="Entrar",
+                label="Haja paz",
+                position=(self.app.screen_center[0], self.app.screen_center[1]),
+                size="lg",
+            ),
+            State(
+                self.app.screen,
                 position=(self.app.screen_center[0], self.app.screen_center[1] * 1.25),
+                label="Entrar",
                 variant="standard",
                 size="lg",
                 callback=lambda: print("Start button clicked"),
             ),
-            Input(
-                self.app.screen,
-                label="input",
-                position=self.app.screen_center,
-                variant="standard",
-                size="lg",
-                text_type="standard",
-            ),
             Button(
                 self.app.screen,
-                label="Sair",
                 position=(self.app.screen_center[0], self.app.screen_center[1] * 1.5),
+                label="Sair",
                 variant="outline",
                 size="lg",
                 callback=lambda: print("Exit button clicked"),
@@ -67,5 +65,3 @@ class StartScene(BaseScene):
                 for i, component in enumerate(self.components):
                     component.is_focused = i == self.active_button
                     print(f"{component.type=}; {component.is_focused}")
-
-        print("*" * 30)
